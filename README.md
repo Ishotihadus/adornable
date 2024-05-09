@@ -237,6 +237,7 @@ The **required argument** is an instance of `Adornable::Context`, which has some
 - `Adornable::Context#method_arguments`: an array of arguments passed to the decorated method, including keyword arguments as a final hash (e.g., if `:yet_another_method` was called like `Foo.new.yet_another_method(123, bar: true, baz: 456)` then `method_arguments` would be `[123, {:bar=>true,:baz=>456}]`)
 - `Adornable::Context#method_positional_args`: an array of just the positional arguments passed to the decorated method, excluding keyword arguments (e.g., if `:yet_another_method` was called like `Foo.new.yet_another_method(123, bar: true, baz: 456)` then `method_positional_args` would be `[123]`)
 - `Adornable::Context#method_kwargs`: a hash of just the keyword arguments passed to the decorated method (e.g., if `:yet_another_method` was called like `Foo.new.yet_another_method(123, { bam: "hi" }, bar: true, baz: 456)` then `method_kwargs` would be `{:bar=>true,:baz=>456}`)
+- `Adornable::Context#method_block`: a Proc object of a block argument passed to the decorated method
 
 ##### Custom keyword arguments (optional)
 
