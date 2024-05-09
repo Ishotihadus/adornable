@@ -10,6 +10,7 @@ module Adornable
       method_arguments
       method_positional_args
       method_kwargs
+      method_block
       decorator_name
       decorator_options
     ])
@@ -20,6 +21,7 @@ module Adornable
       method_arguments:,
       method_positional_args:,
       method_kwargs:,
+      method_block:,
       decorator_name:,
       decorator_options:
     )
@@ -28,6 +30,7 @@ module Adornable
       @method_arguments = method_arguments
       @method_positional_args = method_positional_args
       @method_kwargs = method_kwargs
+      @method_block = method_block
       @decorator_name = decorator_name
       @decorator_options = decorator_options
     end

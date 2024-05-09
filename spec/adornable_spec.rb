@@ -220,12 +220,24 @@ class Foobar
   end
 
   decorate :log
+  def logged_instance_method_block_arg(foo, bar:, &block)
+    yield
+    rand
+  end
+
+  decorate :log
   def self.logged_class_method(foo, bar:)
     rand
   end
 
   decorate :log
   def self.logged_class_method_no_args
+    rand
+  end
+
+  decorate :log
+  def self.logged_class_method_block_arg(foo, bar:, &block)
+    yield
     rand
   end
 
@@ -609,6 +621,18 @@ RSpec.describe Adornable do
           expected_log = "Calling method `Foobar#logged_instance_method_no_args` with no arguments\n"
           expect { foobar.logged_instance_method_no_args }.to output(expected_log).to_stdout
         end
+
+        it "logs the method with normal, keyword, and block arguments to STDOUT" do
+          foobar = Foobar.new
+          normal_args = [123]
+          keyword_args = { bar: { baz: [:hi, "there"] } }
+          block = proc { rand }
+          all_args = [*normal_args, keyword_args, block]
+          expected_log = "Calling method `Foobar#logged_instance_method_block_arg` with arguments `#{all_args.inspect}`\n"
+          expect do
+            foobar.logged_instance_method_block_arg(*normal_args, **keyword_args, &block)
+          end.to output(expected_log).to_stdout
+        end
       end
 
       context "when decorating class methods" do
@@ -625,6 +649,17 @@ RSpec.describe Adornable do
         it "logs the method with no arguments to STDOUT" do
           expected_log = "Calling method `Foobar::logged_class_method_no_args` with no arguments\n"
           expect { Foobar.logged_class_method_no_args }.to output(expected_log).to_stdout
+        end
+
+        it "logs the method with normal, keyword, and block arguments to STDOUT" do
+          normal_args = [123]
+          keyword_args = { bar: { baz: [:hi, "there"] } }
+          block = proc { rand }
+          all_args = [*normal_args, keyword_args, block]
+          expected_log = "Calling method `Foobar::logged_class_method_block_arg` with arguments `#{all_args.inspect}`\n"
+          expect do
+            Foobar.logged_class_method_block_arg(*normal_args, **keyword_args, &block)
+          end.to output(expected_log).to_stdout
         end
       end
     end

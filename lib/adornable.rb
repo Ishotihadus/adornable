@@ -41,9 +41,9 @@ module Adornable
     # Hash member in the `args` array. If you supply both `*args, **kwargs` to
     # the block, kwargs are excluded from the `args` array and only appear in
     # the `kwargs` argument as a Hash.
-    define_method(method_name) do |*args, **kwargs|
+    define_method(method_name) do |*args, **kwargs, &block|
       bound_method = original_method.bind(self)
-      machinery.run_decorated_instance_method(bound_method, *args, **kwargs)
+      machinery.run_decorated_instance_method(bound_method, *args, **kwargs, &block)
     end
 
     super
@@ -60,8 +60,8 @@ module Adornable
     # Hash member in the `args` array. If you supply both `*args, **kwargs` to
     # the block, kwargs are excluded from the `args` array and only appear in
     # the `kwargs` argument as a Hash.
-    define_singleton_method(method_name) do |*args, **kwargs|
-      machinery.run_decorated_class_method(original_method, *args, **kwargs)
+    define_singleton_method(method_name) do |*args, **kwargs, &block|
+      machinery.run_decorated_class_method(original_method, *args, **kwargs, &block)
     end
 
     super

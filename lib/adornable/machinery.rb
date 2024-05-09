@@ -38,14 +38,14 @@ module Adornable
       clear_accumulated_decorators!
     end
 
-    def run_decorated_instance_method(bound_method, *args, **kwargs)
+    def run_decorated_instance_method(bound_method, *args, **kwargs, &block)
       decorators = get_instance_method_decorators(bound_method.name)
-      run_decorators(decorators, bound_method, *args, **kwargs)
+      run_decorators(decorators, bound_method, *args, **kwargs, &block)
     end
 
-    def run_decorated_class_method(bound_method, *args, **kwargs)
+    def run_decorated_class_method(bound_method, *args, **kwargs, &block)
       decorators = get_class_method_decorators(bound_method.name)
-      run_decorators(decorators, bound_method, *args, **kwargs)
+      run_decorators(decorators, bound_method, *args, **kwargs, &block)
     end
 
     private
@@ -88,9 +88,10 @@ module Adornable
       @class_method_decorators[name] = decorators || []
     end
 
-    def run_decorators(decorators, bound_method, *method_positional_args, **method_kwargs)
+    def run_decorators(decorators, bound_method, *method_positional_args, **method_kwargs, &method_block)
       if Adornable::Utils.blank?(decorators)
-        return Adornable::Utils.empty_aware_send(bound_method, :call, method_positional_args, method_kwargs)
+        return Adornable::Utils.empty_aware_send(bound_method, :call,
+                                                 method_positional_args, method_kwargs, &method_block)
       end
 
       decorator, *remaining_decorators = decorators
@@ -110,6 +111,7 @@ module Adornable
       # `#method_kwargs`, to `Adornable::Context` for explicitness.
       method_arguments = method_positional_args.dup
       method_arguments << method_kwargs if Adornable::Utils.present?(method_kwargs)
+      method_arguments << method_block if method_block
 
       context = Adornable::Context.new(
         method_receiver: bound_method.receiver,
@@ -117,12 +119,13 @@ module Adornable
         method_arguments: method_arguments,
         method_positional_args: method_positional_args,
         method_kwargs: method_kwargs,
+        method_block: method_block,
         decorator_name: decorator_name,
         decorator_options: decorator_options,
       )
 
       Adornable::Utils.empty_aware_send(decorator_receiver, decorator_name, [context], decorator_options) do
-        run_decorators(remaining_decorators, bound_method, *method_positional_args, **method_kwargs)
+        run_decorators(remaining_decorators, bound_method, *method_positional_args, **method_kwargs, &method_block)
       end
     end
 
